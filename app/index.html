@@ -4,74 +4,79 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Leonida Legends — GTA VI Trophy Guide &amp; Tracker (PS5, 55 trophies)</title>
-<meta name="description" content="Offline guide and tracker for all 55 Grand Theft Auto VI trophies on PlayStation 5: official names, descriptions and grades, a roadmap to the Platinum, missable flags, and a cited guide for every trophy.">
+<meta name="description" content="Offline guide and tracker for all 55 Grand Theft Auto VI trophies on PlayStation 5: official names, descriptions and grades, a cited guide for every trophy, a six-stage roadmap to the Platinum, and a missable warning.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="hero">
-  <div class="hero-text">
-    <p class="kicker">GRAND THEFT AUTO VI &middot; PLAYSTATION 5 &middot; UNOFFICIAL FAN GUIDE</p>
-    <h1>LEONIDA <span>LEGENDS</span></h1>
-    <p class="sub">Every one of the 55 trophies — official name, description &amp; grade, a guide in our own words with its sources, a roadmap to the Platinum, and a tracker that saves in your browser. Works fully offline. No Rockstar logo or artwork: this look is our own.</p>
+<div class="topbar">
+  <div class="brand">
+    <p class="eyebrow">GRAND THEFT AUTO VI &middot; PLAYSTATION 5 &middot; UNOFFICIAL FAN GUIDE</p>
+    <h1>LEONIDA <em>LEGENDS</em></h1>
+    <p class="lede">All 55 official trophies — name, description and grade from the PlayStation list, a guide in our own words with its sources, a roadmap to the Platinum, and a tracker that remembers your progress in this browser. Fully offline. No Rockstar logo or artwork anywhere: every pixel here is our own.</p>
+    <p class="totals">55 trophies &middot; 1 Platinum &middot; 2 Gold &middot; 6 Silver &middot; 46 Bronze &middot; 28 hidden on PSN &middot; 0 online &middot; 1 possibly missable</p>
   </div>
-  <div class="stats" id="stats" aria-label="Progress">
-    <div class="big"><strong id="earnedCount">0</strong><span>/ 55 earned</span></div>
-    <div class="bar"><div id="progressBar" style="width:0%"></div></div>
-    <p id="progressText">0% to the Platinum &middot; Vice Got a Price!</p>
-    <p class="grades" id="gradeCounts"></p>
-    <p class="meta">1 Platinum &middot; 2 Gold &middot; 6 Silver &middot; 46 Bronze &middot; 28 hidden &middot; 0 online &middot; ~200 h to Platinum</p>
+  <div class="ringbox" aria-label="Progress to the Platinum">
+    <svg class="ring" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Progress ring">
+      <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+      <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52"></circle>
+    </svg>
+    <div class="ring-label"><strong id="earnedBig">0</strong><span>/ 55</span></div>
+    <p class="ring-sub" id="ringSub">0% to the Platinum</p>
+    <p class="ring-grades" id="ringGrades"></p>
   </div>
-</header>
+</div>
 
-<section class="warn" id="missableBanner">
-  <strong>&#9888; THE ONE MISSABLE TROPHY</strong>
-  <span id="missableText">Loading&hellip;</span>
-</section>
+<aside class="alert" id="missable">
+  <span class="alert-mark" aria-hidden="true">!</span>
+  <div>
+    <strong>ONE TROPHY MAY BE MISSABLE</strong>
+    <p id="missableLine">Loading&hellip;</p>
+  </div>
+</aside>
 
-<section class="roadmap" id="roadmapSection" aria-label="Roadmap to the Platinum">
-  <h2>ROADMAP TO THE PLATINUM <span class="dim">&mdash; 6 stages, in order</span></h2>
-  <div class="stages" id="roadmapStrip"></div>
-</section>
+<nav class="roadmap" id="roadmap" aria-label="Roadmap to the Platinum">
+  <h2>ROADMAP TO THE PLATINUM <span>&mdash; six stages, in order</span></h2>
+  <ol class="steps" id="steps"></ol>
+</nav>
 
-<section class="controls" aria-label="Filters and tools">
-  <div class="row">
-    <input id="search" type="search" placeholder="Search a trophy, mission or keyword&hellip;" aria-label="Search trophies">
-    <select id="grade" aria-label="Filter by grade">
-      <option value="all">All grades</option>
+<section class="toolbar" aria-label="Search, filters and tools">
+  <div class="toolrow">
+    <input id="q" type="search" placeholder="Search a trophy, a mission, a keyword&hellip;" aria-label="Search trophies">
+    <select id="gradePick" aria-label="Filter by grade">
+      <option value="all">Every grade</option>
       <option value="platinum">Platinum</option>
       <option value="gold">Gold</option>
       <option value="silver">Silver</option>
       <option value="bronze">Bronze</option>
     </select>
-    <label class="check"><input id="hideEarned" type="checkbox"> Hide earned</label>
-    <label class="check spoiler"><input id="spoilerToggle" type="checkbox"> Spoiler-free mode</label>
+    <label class="toggle"><input id="hideDone" type="checkbox"> Hide earned</label>
+    <label class="toggle spoil"><input id="spoilerPick" type="checkbox"> Spoiler-free mode</label>
   </div>
-  <div class="row kinds" id="kindFilters" role="group" aria-label="Filter by kind">
-    <button type="button" data-kind="all" class="active">All 55</button>
+  <div class="toolrow pills" id="kindPills" role="group" aria-label="Filter by kind">
+    <button type="button" data-kind="all" class="on">All 55</button>
     <button type="button" data-kind="story">Story</button>
     <button type="button" data-kind="missable">Missable</button>
     <button type="button" data-kind="collectibles">Collectibles</button>
     <button type="button" data-kind="activities">Activities</button>
     <button type="button" data-kind="online">Online</button>
-    <button type="button" data-kind="platinum">Platinum &amp; 100%</button>
   </div>
-  <div class="row tools">
-    <button id="export" type="button">Export progress (.json)</button>
-    <label class="import">Import progress <input id="import" type="file" accept="application/json,.json"></label>
-    <button id="reset" type="button">Reset progress</button>
-    <span class="saved" id="savedNote">Progress saves in this browser (localStorage) automatically.</span>
+  <div class="toolrow tools">
+    <button id="exportBtn" type="button">Export progress (.json)</button>
+    <label class="importbtn">Import progress <input id="importFile" type="file" accept="application/json,.json"></label>
+    <button id="resetBtn" type="button">Reset progress</button>
+    <span class="hint" id="saveHint">Ticks save in this browser (localStorage) as you go.</span>
   </div>
 </section>
 
-<noscript><p style="margin:12px 28px;padding:12px 16px;border:1px solid #ff5d5d;border-radius:12px">This guide needs JavaScript to load its trophy list and save your progress. Please enable JavaScript and reload.</p></noscript>
-<p class="countline" id="countLine"></p>
-<main class="grid" id="grid"></main>
+<noscript><p class="noscript">This guide needs JavaScript to load its trophy list and save your progress. Please enable JavaScript and reload.</p></noscript>
+<p class="statusline" id="statusLine"></p>
+<main class="cards" id="cards"></main>
 
 <footer>
-  <h2>How this guide is sourced</h2>
-  <p>Names, descriptions and grades are the official PlayStation list (via Exophase and PSNProfiles). Every guide is written in our own words for this entry and cites its sources beside it — a specific step with no source gets no credit, so none is claimed without one. Where launch-era guides confirm nothing yet, the guide says so instead of inventing a location or step. GTA VI launches 19 November 2026, so some methods will only be confirmed after launch.</p>
-  <p id="sourceList"></p>
-  <p class="dim">Unofficial fan guide. Not affiliated with Rockstar Games, PlayStation or Sony. Grand Theft Auto and GTA are trademarks of Take-Two Interactive. All artwork here is original CSS/SVG made for this guide.</p>
+  <h2>Where this guide comes from</h2>
+  <p>Names, descriptions and grades are the official PlayStation list (Exophase and PSNProfiles). Every guide is written in our own words for this entry and names its sources beside it — a specific step or number with no source earns no credit, so none is claimed without one. Where the launch-era guides confirm nothing yet, the guide says so instead of inventing a location or a step. GTA VI launched 19 November 2026, so some methods will only be confirmed after launch.</p>
+  <p id="srcLine"></p>
+  <p class="fine">Unofficial fan guide. Not affiliated with Rockstar Games, PlayStation or Sony. Grand Theft Auto and GTA are trademarks of Take-Two Interactive. All artwork here is original CSS made for this guide.</p>
 </footer>
 <script type="module" src="app.js"></script>
 </body>

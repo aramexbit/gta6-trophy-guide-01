@@ -1,38 +1,51 @@
-// Leonida Legends — gta6-trophy-guide-01 entry (Node 22, standard library only).
-// The guide is this directory's app/ folder: plain static files a browser opens
-// at app/index.html (ES module, CSS, no build step), fully offline — it loads
-// nothing over the network. Its trophy list and guides are app/data/trophies.json:
-// all 55 official PS5 trophies with their official names, descriptions and grades,
-// plus a guide in our own words with cited sources, a kind, a missable flag and a
-// roadmap stage for each one. The program hands it in: it copies app/ and
-// screenshots/ from beside this file to /output and writes /output/dossier.json,
-// the summary the judge reads (screenshots, the first load's files and bytes, and
-// the source), with the vendored make.fun library. Leave vendor/makefun-frontend.ts
-// as it is: the scorer requires dossier.json to be byte for byte what its own copy writes.
+// Leonida Legends — gta6-trophy-guide-01 entry, Node 22, standard library only.
 //
-// Serve it locally with `node serve.ts`, then open http://localhost:8080.
-// Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// The guide itself is the app/ folder beside this file: plain static files
+// (index.html, an ES module, CSS and app/data/trophies.json) with no build step,
+// fully offline. It covers all 55 official PS5 trophies — official names,
+// descriptions and grades, plus a guide in our own words with cited sources,
+// a kind, a missable flag and a roadmap stage per trophy. This program hands
+// the guide in: it copies app/ and screenshots/ into the output directory and
+// writes /output/dossier.json with the vendored make.fun library, the summary
+// the judge reads. vendor/makefun-frontend.ts is the kit's file — leave it alone:
+// the scorer requires dossier.json to be byte for byte what its own copy writes.
+//
+// Run it locally:  mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// (Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output.)
 
-import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-frontend.ts';
 
-const here = fileURLToPath(new URL('.', import.meta.url));
-const out = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const repoRoot = fileURLToPath(new URL('.', import.meta.url));
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const appDir = join(repoRoot, 'app');
+const shotsDir = join(repoRoot, 'screenshots');
 
-mkdirSync(out, { recursive: true });
-cpSync(join(here, 'app'), join(out, 'app'), { recursive: true });
-mkdirSync(join(out, 'screenshots'), { recursive: true });
-if (existsSync(join(here, 'screenshots'))) cpSync(join(here, 'screenshots'), join(out, 'screenshots'), { recursive: true });
+mkdirSync(outDir, { recursive: true });
+cpSync(appDir, join(outDir, 'app'), { recursive: true });
+mkdirSync(join(outDir, 'screenshots'), { recursive: true });
+if (existsSync(shotsDir)) cpSync(shotsDir, join(outDir, 'screenshots'), { recursive: true });
 
-// The scorer's own caps (reference/gate.json): only text_max_bytes shapes the bytes; the others refuse an entry the
-// scorer would refuse (more than 4 screenshots or one over 256 KiB; more than 993 files and directories in app/ or
-// 48 MiB of app files: app/ counts beside /output's own 1000-entry cap, its screenshots/ and dossier.json).
-// The program is deterministic: two runs over the same tree write the same
-// dossier.json bytes, as the grader requires (it runs main.ts twice).
+// Refuse to hand in an entry the sealed scorer would refuse: more than four
+// screenshots, one over 256 KiB, or an app/ over the file and byte caps. Only
+// the text cap shapes the dossier bytes; the rest are guard rails.
+const shots = existsSync(shotsDir) ? readdirSync(shotsDir) : [];
+if (shots.length > 4) throw new Error(`too many screenshots: ${shots.length} (max 4)`);
+for (const file of shots) {
+  const { size } = statSync(join(shotsDir, file));
+  if (size > 262144) throw new Error(`screenshot too big: ${file} (${size} bytes, max 262144)`);
+  if (!/\.(jpe?g|png)$/i.test(file)) throw new Error(`screenshot must be JPEG or PNG: ${file}`);
+}
+
 writeFileSync(
-  join(out, 'dossier.json'),
-  buildDossier(out, { text_max_bytes: 163840, screenshots: { max: 4, max_bytes: 262144 }, app_max_files: 993, app_max_bytes: 50331648 }),
+  join(outDir, 'dossier.json'),
+  buildDossier(outDir, {
+    text_max_bytes: 163840,
+    screenshots: { max: 4, max_bytes: 262144 },
+    app_max_files: 993,
+    app_max_bytes: 50331648,
+  }),
 );
+console.log(`Leonida Legends handed in: ${outDir} (${shots.length} screenshots)`);
