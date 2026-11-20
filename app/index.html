@@ -3,122 +3,220 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Leonida Legends — GTA 6 Trophy Guide</title>
-<meta name="description" content="A complete, offline trophy guide for Grand Theft Auto VI on PlayStation 5: all 55 trophies, a checklist tracker, a six-stage roadmap to Platinum, and spoiler controls.">
+<title>Leonida Legends — GTA 6 Trophy Guide &amp; Tracker</title>
+<meta name="description" content="The complete GTA 6 trophy guide for PlayStation 5: all 55 trophies, a 6-stage roadmap to platinum, the one missable trophy flagged, and a spoiler-safe tracker.">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
-<div class="sunset-band" aria-hidden="true"></div>
-
-<header class="masthead">
-  <div class="masthead-inner">
-    <div class="masthead-copy">
-      <p class="eyebrow">Grand Theft Auto VI &middot; PlayStation 5 &middot; 55 trophies</p>
-      <h1>Leonida Legends</h1>
-      <p class="tagline">Every trophy in the state of Leonida, mapped out — from your first sunrise in Vice City to the Platinum that crowns the journey.</p>
-      <p class="meta-line"><span id="earnedLine">0 of 55 trophies earned</span> &middot; <span id="percentLine">0% complete</span> &middot; <span id="unconfirmedLine">7 trophies still unconfirmed</span></p>
-      <div class="masthead-actions">
-        <button id="exportBtn" type="button">Export checklist</button>
-        <button id="importBtn" type="button">Import checklist</button>
-        <input id="importFile" type="file" accept="application/json,.json" hidden>
-        <button id="resetBtn" type="button">Reset progress</button>
-      </div>
-    </div>
-    <div class="ring-wrap" role="img" aria-label="Overall trophy progress">
-      <svg class="ring" viewBox="0 0 180 180" width="180" height="180">
-        <circle class="ring-track" cx="90" cy="90" r="76"></circle>
-        <circle class="ring-fill" id="ringFill" cx="90" cy="90" r="76"></circle>
-      </svg>
-      <div class="ring-center">
-        <span class="ring-number" id="ringNumber">0%</span>
-        <span class="ring-label">to Platinum</span>
-      </div>
-    </div>
+<body data-view="checklist">
+<header class="hero">
+  <!-- Original SVG/CSS art: a Vice City sunset drawn by hand. No Rockstar artwork, no photos. -->
+  <svg class="hero-art" viewBox="0 0 1280 360" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sunset over the Vice City skyline and the ocean, drawn in original vector art">
+    <defs>
+      <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#160a2e"/><stop offset=".34" stop-color="#4b1d6e"/>
+        <stop offset=".55" stop-color="#a32a6e"/><stop offset=".7" stop-color="#ff5e78"/>
+        <stop offset=".86" stop-color="#ff9a5c"/><stop offset="1" stop-color="#ffc46b"/>
+      </linearGradient>
+      <radialGradient id="sunGrad" cx=".5" cy=".42" r=".65">
+        <stop offset="0" stop-color="#fff7c0"/><stop offset=".45" stop-color="#ffd166"/>
+        <stop offset=".75" stop-color="#ff7a59"/><stop offset="1" stop-color="#ff2e88"/>
+      </radialGradient>
+      <radialGradient id="sunGlow" cx=".5" cy=".5" r=".5">
+        <stop offset="0" stop-color="#ffb347" stop-opacity=".55"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="seaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#8a3a7d"/><stop offset=".45" stop-color="#2a4a6b"/><stop offset="1" stop-color="#0b1e33"/>
+      </linearGradient>
+      <linearGradient id="reflGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#ffb347" stop-opacity=".55"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="neon" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="3.2" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <mask id="sunMask">
+        <circle cx="640" cy="232" r="100" fill="#fff"/>
+        <rect x="520" y="240" width="240" height="5" fill="#000"/>
+        <rect x="520" y="253" width="240" height="7" fill="#000"/>
+        <rect x="520" y="267" width="240" height="9" fill="#000"/>
+        <rect x="520" y="283" width="240" height="11" fill="#000"/>
+        <rect x="520" y="301" width="240" height="13" fill="#000"/>
+        <rect x="520" y="321" width="240" height="15" fill="#000"/>
+      </mask>
+      <g id="palmL">
+        <path d="M58,360 C66,305 78,255 108,196" stroke="#0a0518" stroke-width="11" fill="none" stroke-linecap="round"/>
+        <path d="M108,196 Q150,158 198,172" stroke="#0a0518" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M108,196 Q142,138 188,136" stroke="#0a0518" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M108,196 Q98,138 56,128" stroke="#0a0518" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M108,196 Q66,168 26,184" stroke="#0a0518" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M108,196 Q122,176 152,212" stroke="#0a0518" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M108,196 Q92,180 72,216" stroke="#0a0518" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <circle cx="104" cy="203" r="6" fill="#0a0518"/><circle cx="117" cy="205" r="6" fill="#0a0518"/>
+      </g>
+    </defs>
+    <rect width="1280" height="360" fill="url(#skyGrad)"/>
+    <g fill="#ffffff">
+      <circle cx="90" cy="42" r="1.6" opacity=".8"/><circle cx="210" cy="24" r="1.2" opacity=".6"/>
+      <circle cx="330" cy="58" r="1.8" opacity=".9"/><circle cx="470" cy="30" r="1.2" opacity=".6"/>
+      <circle cx="560" cy="66" r="1.5" opacity=".7"/><circle cx="760" cy="36" r="1.7" opacity=".8"/>
+      <circle cx="880" cy="22" r="1.2" opacity=".6"/><circle cx="1010" cy="52" r="1.8" opacity=".9"/>
+      <circle cx="1150" cy="30" r="1.4" opacity=".7"/><circle cx="1230" cy="66" r="1.6" opacity=".8"/>
+      <circle cx="150" cy="86" r="1.2" opacity=".5"/><circle cx="1090" cy="88" r="1.2" opacity=".5"/>
+    </g>
+    <g stroke="#1a0b2e" stroke-width="2.5" fill="none" stroke-linecap="round">
+      <path d="M300,70 q9,-9 18,0 q9,-9 18,0"/><path d="M360,95 q7,-7 14,0 q7,-7 14,0"/>
+      <path d="M940,60 q9,-9 18,0 q9,-9 18,0"/>
+    </g>
+    <circle cx="640" cy="232" r="150" fill="url(#sunGlow)"/>
+    <circle cx="640" cy="232" r="100" fill="url(#sunGrad)" mask="url(#sunMask)"/>
+    <!-- far skyline -->
+    <g fill="#54247a" opacity=".78">
+      <rect x="0" y="197" width="70" height="55"/><rect x="70" y="162" width="45" height="90"/>
+      <rect x="115" y="212" width="60" height="40"/><rect x="175" y="142" width="40" height="110"/>
+      <rect x="215" y="187" width="70" height="65"/><rect x="285" y="157" width="50" height="95"/>
+      <rect x="335" y="202" width="65" height="50"/><rect x="400" y="132" width="45" height="120"/>
+      <rect x="445" y="182" width="70" height="70"/><rect x="515" y="207" width="55" height="45"/>
+      <rect x="570" y="152" width="40" height="100"/><rect x="610" y="192" width="65" height="60"/>
+      <rect x="675" y="167" width="50" height="85"/><rect x="725" y="197" width="75" height="55"/>
+      <rect x="800" y="147" width="45" height="105"/><rect x="845" y="187" width="60" height="65"/>
+      <rect x="905" y="212" width="50" height="40"/><rect x="955" y="157" width="70" height="95"/>
+      <rect x="1025" y="192" width="45" height="60"/><rect x="1070" y="142" width="65" height="110"/>
+      <rect x="1135" y="202" width="55" height="50"/><rect x="1190" y="172" width="90" height="80"/>
+    </g>
+    <g fill="#ffd166" opacity=".65">
+      <rect x="80" y="175" width="4" height="6"/><rect x="92" y="190" width="4" height="6"/>
+      <rect x="185" y="155" width="4" height="6"/><rect x="300" y="170" width="4" height="6"/>
+      <rect x="410" y="145" width="4" height="6"/><rect x="420" y="165" width="4" height="6"/>
+      <rect x="580" y="165" width="4" height="6"/><rect x="690" y="180" width="4" height="6"/>
+      <rect x="810" y="160" width="4" height="6"/><rect x="860" y="200" width="4" height="6"/>
+      <rect x="970" y="170" width="4" height="6"/><rect x="1085" y="155" width="4" height="6"/>
+      <rect x="1200" y="185" width="4" height="6"/><rect x="1220" y="205" width="4" height="6"/>
+    </g>
+    <!-- ocean -->
+    <rect x="0" y="252" width="1280" height="108" fill="url(#seaGrad)"/>
+    <rect x="590" y="252" width="100" height="108" fill="url(#reflGrad)"/>
+    <g fill="#ffb347">
+      <rect x="520" y="268" width="240" height="3" opacity=".28"/><rect x="470" y="284" width="340" height="3" opacity=".22"/>
+      <rect x="560" y="302" width="160" height="3" opacity=".26"/><rect x="430" y="322" width="420" height="3" opacity=".16"/>
+      <rect x="600" y="342" width="120" height="3" opacity=".2"/>
+    </g>
+    <g fill="#7ef0e0">
+      <rect x="120" y="278" width="180" height="2" opacity=".14"/><rect x="980" y="296" width="220" height="2" opacity=".14"/>
+      <rect x="180" y="330" width="260" height="2" opacity=".12"/><rect x="900" y="338" width="200" height="2" opacity=".12"/>
+    </g>
+    <!-- near skyline -->
+    <g fill="#150a26">
+      <rect x="30" y="122" width="90" height="130"/><rect x="120" y="157" width="70" height="95"/>
+      <rect x="190" y="102" width="55" height="150"/><rect x="198" y="88" width="39" height="20"/>
+      <rect x="206" y="76" width="23" height="16"/><rect x="214" y="58" width="7" height="20"/>
+      <rect x="300" y="77" width="110" height="175"/><rect x="312" y="63" width="86" height="16"/>
+      <rect x="326" y="51" width="58" height="14"/><rect x="350" y="30" width="10" height="22"/>
+      <rect x="430" y="142" width="80" height="110"/><rect x="510" y="177" width="60" height="75"/>
+      <rect x="900" y="92" width="120" height="160"/><rect x="912" y="78" width="96" height="16"/>
+      <rect x="928" y="66" width="64" height="14"/><rect x="956" y="44" width="8" height="24"/>
+      <rect x="1040" y="152" width="70" height="100"/><rect x="1110" y="117" width="90" height="135"/>
+      <rect x="1200" y="162" width="80" height="90"/>
+    </g>
+    <g fill="#ffd166" opacity=".9">
+      <rect x="318" y="95" width="5" height="7"/><rect x="336" y="95" width="5" height="7"/>
+      <rect x="354" y="95" width="5" height="7"/><rect x="372" y="95" width="5" height="7"/>
+      <rect x="318" y="115" width="5" height="7"/><rect x="354" y="115" width="5" height="7"/>
+      <rect x="390" y="115" width="5" height="7"/><rect x="336" y="135" width="5" height="7"/>
+      <rect x="372" y="135" width="5" height="7"/><rect x="318" y="160" width="5" height="7"/>
+      <rect x="354" y="160" width="5" height="7"/><rect x="390" y="160" width="5" height="7"/>
+      <rect x="918" y="110" width="5" height="7"/><rect x="936" y="110" width="5" height="7"/>
+      <rect x="954" y="110" width="5" height="7"/><rect x="972" y="110" width="5" height="7"/>
+      <rect x="990" y="110" width="5" height="7"/><rect x="918" y="132" width="5" height="7"/>
+      <rect x="954" y="132" width="5" height="7"/><rect x="990" y="132" width="5" height="7"/>
+      <rect x="936" y="155" width="5" height="7"/><rect x="972" y="155" width="5" height="7"/>
+    </g>
+    <g fill="#7ef0e0" opacity=".85">
+      <rect x="336" y="180" width="5" height="7"/><rect x="372" y="180" width="5" height="7"/>
+      <rect x="936" y="180" width="5" height="7"/><rect x="972" y="180" width="5" height="7"/>
+      <rect x="205" y="120" width="5" height="7"/><rect x="222" y="120" width="5" height="7"/>
+    </g>
+    <text x="960" y="158" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="23" font-weight="900" letter-spacing="4" fill="#2ee6c8" filter="url(#neon)">LEONIDA</text>
+    <text x="960" y="182" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="7" fill="#ffd166">HOTEL</text>
+    <use href="#palmL"/>
+    <use href="#palmL" transform="translate(1280,0) scale(-1,1)"/>
+  </svg>
+  <div class="hero-copy">
+    <p class="kicker">Grand Theft Auto VI &middot; PlayStation 5 &middot; Official 55-trophy list</p>
+    <h1>LEONIDA<br>LEGENDS</h1>
+    <p class="tagline">Every trophy. One road to platinum. The complete GTA 6 trophy guide &amp; tracker.</p>
   </div>
+  <p class="hero-badge">55 trophies &middot; 1 platinum &middot; 2 gold &middot; 6 silver &middot; 46 bronze</p>
 </header>
 
-<main>
-  <section class="warn-banner" id="warnBanner" aria-label="Missable trophy warning">
-    <span class="warn-mark" aria-hidden="true">!</span>
-    <div>
-      <strong>One trophy can be missed.</strong>
-      <span><b>Positive Mental Attitude</b> — meditate at all 18 spots across Leonida. Some spots close off as the story advances, so clear each spot the moment you find it. Every other trophy can be finished after the story.</span>
+<main class="wrap">
+  <section class="stats" aria-label="Progress">
+    <div class="ring-block">
+      <svg class="ring" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Trophy progress ring">
+        <circle cx="60" cy="60" r="52" fill="none" stroke="#2a1a4a" stroke-width="11"/>
+        <circle id="ringFg" cx="60" cy="60" r="52" fill="none" stroke="#ffb347" stroke-width="11" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" transform="rotate(-90 60 60)"/>
+        <text id="ringText" x="60" y="57" text-anchor="middle" fill="#fff" font-size="24" font-weight="900">0%</text>
+        <text x="60" y="76" text-anchor="middle" fill="#c9b8e8" font-size="10">COMPLETE</text>
+      </svg>
+      <div class="ring-side">
+        <p class="big"><span id="doneCount">0</span> / <span id="totalCount">55</span> earned</p>
+        <p class="muted" id="progressNote">Tick trophies as you earn them — progress is saved in your browser.</p>
+        <p class="muted demo-note" id="demoNote" hidden>Sample progress shown (?demo=1) — clear it any time with Reset.</p>
+      </div>
     </div>
+    <div class="grades" id="gradeTiles" aria-label="Progress by grade"></div>
   </section>
 
-  <section class="grade-strip" id="gradeStrip" aria-label="Progress by grade"></section>
+  <aside class="missable" id="missableBanner">
+    <span class="warn-icon" aria-hidden="true">!</span>
+    <p><strong>MISSABLE — 1 trophy can be lost.</strong> <button class="linklike" id="missableLink" type="button">Positive Mental Attitude</button> — meditate at all 18 spots before the story moves on. Do it early, or the platinum costs a second playthrough.</p>
+  </aside>
 
-  <section class="controls" aria-label="Filters and options">
-    <div class="control-row">
-      <label class="search-box">
-        <span class="search-icon" aria-hidden="true">&#x2315;</span>
-        <input id="searchInput" type="search" placeholder="Search trophies, missions, activities…" autocomplete="off">
-      </label>
-      <label class="spoiler-toggle">
-        <input id="spoilerToggle" type="checkbox">
-        <span class="toggle-pill" aria-hidden="true"></span>
-        Spoiler mode — hide guides
-      </label>
-    </div>
-    <div class="filter-row" id="kindFilters" role="group" aria-label="Filter by type">
-      <button type="button" data-kind="all" class="chip active">All types</button>
-      <button type="button" data-kind="story" class="chip">Story</button>
-      <button type="button" data-kind="missable" class="chip">Missable</button>
-      <button type="button" data-kind="collectibles" class="chip">Collectibles</button>
-      <button type="button" data-kind="activities" class="chip">Activities</button>
-      <button type="button" data-kind="online" class="chip">Online</button>
-    </div>
-    <div class="filter-row" id="gradeFilters" role="group" aria-label="Filter by grade">
-      <button type="button" data-grade="all" class="chip active">All grades</button>
-      <button type="button" data-grade="platinum" class="chip">Platinum</button>
-      <button type="button" data-grade="gold" class="chip">Gold</button>
-      <button type="button" data-grade="silver" class="chip">Silver</button>
-      <button type="button" data-grade="bronze" class="chip">Bronze</button>
-    </div>
-    <div class="filter-row" id="stateFilters" role="group" aria-label="Filter by state">
-      <button type="button" data-state="all" class="chip active">Show all</button>
-      <button type="button" data-state="earned" class="chip">Earned only</button>
-      <button type="button" data-state="missing" class="chip">Not yet earned</button>
-      <button type="button" data-state="unconfirmed" class="chip">Unconfirmed only</button>
-    </div>
-    <p class="result-count" id="resultCount"></p>
+  <section class="toolbar" aria-label="Find trophies">
+    <input id="search" type="search" placeholder="Search 55 trophies — try &lsquo;bank&rsquo;, &lsquo;bowling&rsquo;, &lsquo;meditate&rsquo;…" aria-label="Search trophies">
+    <div class="chips" id="catChips" role="group" aria-label="Filter by category"></div>
+    <label class="grade-label">Grade
+      <select id="gradeFilter" aria-label="Filter by grade">
+        <option value="all">All grades</option>
+        <option value="platinum">Platinum</option>
+        <option value="gold">Gold</option>
+        <option value="silver">Silver</option>
+        <option value="bronze">Bronze</option>
+      </select>
+    </label>
+    <button id="spoilerToggle" class="btn" type="button" aria-pressed="false">🙈 Spoiler mode: off</button>
+    <button id="exportBtn" class="btn" type="button">Export JSON</button>
+    <button id="importBtn" class="btn" type="button">Import JSON</button>
+    <input id="importFile" type="file" accept="application/json,.json" hidden>
+    <button id="resetBtn" class="btn ghost" type="button">Reset</button>
   </section>
 
-  <section class="roadmap" id="roadmap" aria-label="Roadmap to Platinum">
-    <div class="section-head">
-      <h2>Roadmap to Platinum</h2>
-      <p>Six stages, in the order a first playthrough should take them. Stage 3 holds the missable trophy — do not skip it.</p>
-    </div>
-    <ol class="roadmap-list" id="roadmapList"></ol>
+  <p class="spoiler-banner" id="spoilerBanner" hidden>🙈 <strong>Spoiler mode is ON</strong> — every guide is blurred until you tap it. Story details stay hidden.</p>
+  <p class="empty" id="emptyState" hidden>No trophies match. Try another search, or clear the filters.</p>
+
+  <section id="checklist" aria-label="Trophy checklist">
+    <h2 class="section-title">The Checklist <span class="count" id="listCount"></span></h2>
+    <div id="trophyList" class="trophy-list"></div>
   </section>
 
-  <section class="list-section" aria-label="Trophy checklist">
-    <div class="section-head">
-      <h2>Trophy checklist</h2>
-      <p>Tick a trophy when it pops. Progress is saved in this browser automatically.</p>
-    </div>
-    <div class="trophy-grid" id="trophyGrid"></div>
-    <p class="empty-note" id="emptyNote" hidden>No trophies match these filters. Try clearing the search or a filter.</p>
+  <section id="roadmap" aria-label="Roadmap to platinum">
+    <h2 class="section-title">Roadmap to Platinum — 6 stages</h2>
+    <p class="section-sub">Follow the stages in order. Stage 5 holds the one missable trophy — do its meditation spots early.</p>
+    <div id="roadmapGrid" class="roadmap-grid"></div>
+    <div class="roadmap-sky" aria-hidden="true"></div>
   </section>
 
-  <section class="sources-note">
-    <h2>About this guide</h2>
-    <p>Names, descriptions, and grades are the official PlayStation 5 trophy list for Grand Theft Auto VI. Every guide paragraph was written for this page, and each one names the community sources it leans on — GTABase, KeenGamer, PowerPyx, Exophase, PSNProfiles, and Rockstar's own materials. Seven trophies are flagged <strong>unconfirmed</strong>: the community has not yet verified a reliable unlock method for them, so treat those guides as best current guesses and check the source sites before chasing them.</p>
-    <p>This is an unofficial fan-made guide. It is not affiliated with, endorsed by, or connected to Rockstar Games or Take-Two Interactive. No Rockstar logos or artwork are used here.</p>
-  </section>
+  <footer>
+    <p><strong>Sources:</strong> GTABase · KeenGamer · PowerPyx · Exophase · PSNProfiles · Rockstar Games. Guides are written in our own words; each trophy cites its sources. Trophy names, descriptions and grades are the official PlayStation list (55 trophies, 2026-11-18).</p>
+    <p>Unofficial fan guide — not affiliated with Rockstar Games. No Rockstar logo, artwork or game screenshots are used; the sunset, skyline and palms above are original SVG art drawn for this guide. 7 trophies are marked <em>unconfirmed</em> where the community still disagrees on the exact trigger.</p>
+  </footer>
 </main>
 
-<footer class="page-foot">
-  <p>Leonida Legends — an unofficial, offline trophy guide for Grand Theft Auto VI (PS5).</p>
-</footer>
+<dialog id="detail" aria-label="Trophy detail">
+  <div id="detailBody"></div>
+  <button id="closeDetail" class="btn" type="button">Close</button>
+</dialog>
 
-<div class="detail-overlay" id="detailOverlay" hidden>
-  <div class="detail-card" role="dialog" aria-modal="true" aria-labelledby="detailName">
-    <button class="detail-close" id="detailClose" type="button" aria-label="Close details">&times;</button>
-    <div id="detailBody"></div>
-  </div>
-</div>
-
-<script src="app.js"></script>
+<noscript><p class="noscript">Enable JavaScript to use the trophy tracker — the list, filters and progress need it.</p></noscript>
+<script type="module" src="app.js"></script>
 </body>
 </html>

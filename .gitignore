@@ -1,4 +1,3 @@
 out/
-out2/
 node_modules/
-.chrome-shots-profile/
+.DS_Store
