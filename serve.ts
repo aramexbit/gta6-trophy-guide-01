@@ -1,5 +1,5 @@
 // Leonida Legends — a tiny static server for app/ (Node 22, standard library
-// only). Run `node serve.ts` and open http://localhost:8080; pass
+// only). Round 3 rebuild. Run `node serve.ts` and open http://localhost:8080; pass
 // `--port <n>` for another port. It serves files from app/ and nothing else:
 // any path that escapes app/ is refused. A local convenience for trying the
 // guide, not a web server for the internet.

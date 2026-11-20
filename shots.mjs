@@ -84,7 +84,7 @@ try {
   // 2 — the missable trophy (Positive Mental Attitude) with its guide and sources.
   await shot('2-detail.jpg', 'http://localhost:8080/?demo=1', 'trophy-28');
   // 3 — roadmap to the Platinum with per-stage progress.
-  await shot('3-roadmap.jpg', 'http://localhost:8080/?demo=1', 'roadmap');
+  await shot('3-roadmap.jpg', 'http://localhost:8080/?demo=1', 'roadmapSection');
   // 4 — spoiler-free mode on: unearned story trophies locked.
   await shot('4-spoiler.jpg', 'http://localhost:8080/?demo=1&spoiler=1', 'trophy-5');
 

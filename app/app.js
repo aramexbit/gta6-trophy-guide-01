@@ -2,8 +2,8 @@
 // Plain static app, fully offline: it fetches only app/data/trophies.json,
 // renders the checklist, the roadmap and the filters, and keeps earned ticks
 // in localStorage with export and import. No network, no artwork, no build step.
-const PROGRESS_KEY = 'leonida-legends-v2-progress';
-const SPOILER_KEY = 'leonida-legends-v2-spoiler';
+const PROGRESS_KEY = 'leonida-legends-v3-progress';
+const SPOILER_KEY = 'leonida-legends-v3-spoiler';
 const query = new URLSearchParams(location.search);
 
 const cardsEl = document.getElementById('cards');
@@ -41,6 +41,7 @@ function persistSpoiler() {
 state.earned = readStored();
 if (query.get('demo') === '1' && !localStorage.getItem(PROGRESS_KEY)) {
   // Sample progress for trying the tracker and for screenshots: 14 earned.
+  // Round 3 keeps the same demo set as v2 so the four shots stay comparable.
   state.earned = new Set([
     'Just Like Paradise', 'Paradise Lost', 'Family Matters', 'Break the Bank',
     'Cunning Stunts', 'Master of None', 'Stick Fiddler', 'Baited My Tackle',

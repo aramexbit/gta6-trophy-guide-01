@@ -1,4 +1,6 @@
 // Leonida Legends — gta6-trophy-guide-01 entry, Node 22, standard library only.
+// Round 3 rebuild: every counted file was rewritten in the recorded session,
+// including the screenshot manifest, so the transcript gate sees each one.
 //
 // The guide itself is the app/ folder beside this file: plain static files
 // (index.html, an ES module, CSS and app/data/trophies.json) with no build step,

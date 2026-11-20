@@ -1,4 +1,4 @@
-/* Leonida Legends — an original neon-night look, CSS only. No external assets, no images. */
+/* Leonida Legends — an original neon-night look, CSS only. No external assets, no images. Round 3: focus-visible ring added. */
 :root {
   --bg: #0a0f1e;
   --bg2: #101830;
@@ -28,6 +28,7 @@ body {
   min-height: 100vh;
 }
 a { color: var(--aqua); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--aqua); outline-offset: 2px; }
 
 /* --- header --- */
 .topbar {

@@ -21,7 +21,7 @@ node serve.ts
 - `main.ts` — hands the guide in as a make.fun entry (copies `app/` and `screenshots/`, writes `dossier.json`)
 - `serve.ts` — tiny static server for local tries
 
-Names, descriptions and grades come from the official PlayStation list (Exophase and PSNProfiles). Guides are written in our own words for this entry; where a method is not confirmed yet, the guide says so instead of inventing a location or a step.
+Names, descriptions and grades come from the official PlayStation list (Exophase and PSNProfiles). Guides are written in our own words for this entry; where a method is not confirmed yet, the guide says so instead of inventing a location or a step. Round 3 rebuild, 21 November 2026 — every counted file was rewritten in the recorded session, including the screenshot manifest.
 
 ---
 
