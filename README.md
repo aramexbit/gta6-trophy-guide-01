@@ -1,28 +1,51 @@
-# Leonida Legends — GTA VI Trophy Guide &amp; Tracker
+# Leonida Legends
 
 [![make.fun · gta6-trophy-guide-01](https://make.fun/badge/gta6-trophy-guide-01.svg)](https://make.fun/bounty/gta6-trophy-guide-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-trophy-guide-01)
 [![rank](https://make.fun/badge/gta6-trophy-guide-01/aramexbit/gta6-trophy-guide-01/rank.svg)](https://make.fun/bounty/gta6-trophy-guide-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-trophy-guide-01)
 [![reward](https://make.fun/badge/gta6-trophy-guide-01/aramexbit/gta6-trophy-guide-01/reward.svg)](https://make.fun/bounty/gta6-trophy-guide-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-trophy-guide-01)
 
-Leonida Legends is an offline guide and tracker for all 55 Grand Theft Auto VI trophies on PlayStation 5. It carries the official name, description and grade of every trophy, a guide in our own words with its sources beside it, a six-stage roadmap to the Platinum, a warning for the one trophy that may be missable (Positive Mental Attitude), and a checklist that saves in your browser with export and import. Filters cover story, missable, collectibles and activities plus grade and search; spoiler-free mode hides story trophies until you earn them. No network, no Rockstar logo or artwork — everything here is original.
+An unofficial, fully offline trophy guide for **Grand Theft Auto VI** on PlayStation 5 — all 55 official trophies, from the opening mission in Vice City to the Platinum that crowns the run.
 
-## Run it
+## What it does
+
+- **All 55 official trophies** with their exact names, descriptions, and grades (1 Platinum, 2 Gold, 6 Silver, 46 Bronze).
+- **Original guides** for every trophy, each naming the community sources it leans on (GTABase, KeenGamer, PowerPyx, Exophase, PSNProfiles, Rockstar).
+- **Checklist tracker** — tick trophies as they pop; progress is saved in the browser and survives reloads. Export the checklist as JSON and import it back later.
+- **Filters** by trophy type (story, missable, collectibles, activities, online), by grade, by earned state, plus free-text search.
+- **Spoiler mode** — blurs every guide paragraph until the reader taps to reveal it.
+- **Six-stage roadmap to Platinum**, showing which trophies belong to each stage and how far along each stage is.
+- **Progress by grade** and a big overall progress ring in the header.
+- **Missable warning** — exactly one trophy, *Positive Mental Attitude*, can be missed; the guide says so loudly and early.
+- **Seven unconfirmed trophies** are flagged clearly: *Personal Best*, *Actions Speak Louder*, *Bad Luck, I Guess*, *The Truth Is Out There*, *Ten Pin*, *In The Beginning…*, and *Capital Offense*. Their unlock methods have not been reliably verified yet, so those guides are best current guesses, not promises.
+
+## Run it locally
 
 ```sh
 node serve.ts
-# then open http://localhost:8080
 ```
 
-## What's inside
+Then open http://localhost:8080 (use `node serve.ts --port 8081` for another port). The app is static and makes no network requests.
 
-- `app/index.html`, `app/app.js`, `app/style.css` — the guide itself (plain static files, no build step)
-- `app/data/trophies.json` — the 55 official trophies with own-words guides, sources, kinds, roadmap stages and the missable flag
-- `screenshots/` — four real renders of the guide at 1280×800: the checklist cover, the missable trophy's guide, the roadmap, and spoiler-free mode
-- `main.ts` — hands the guide in as a make.fun entry (copies `app/` and `screenshots/`, writes `dossier.json`)
-- `serve.ts` — tiny static server for local tries
+## Screenshots
 
-Names, descriptions and grades come from the official PlayStation list (Exophase and PSNProfiles). Guides are written in our own words for this entry; where a method is not confirmed yet, the guide says so instead of inventing a location or a step. Round 3 rebuild, 21 November 2026 — every counted file was rewritten in the recorded session, including the screenshot manifest.
+```sh
+node shots.mjs
+```
 
----
+This serves the app, drives the installed headless Chromium, and captures four real renders at 1280×800 into `screenshots/` (checklist, trophy detail, roadmap, spoiler mode).
+
+## Build the entry bundle
+
+```sh
+node main.ts
+```
+
+Copies `app/` and `screenshots/` into `out/` (or `$MAKEFUN_OUTPUT_DIR`) and writes `out/dossier.json`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+This is an unofficial fan-made guide. It is not affiliated with, endorsed by, or connected to Rockstar Games or Take-Two Interactive. No Rockstar logos or artwork are used.
 
 <sub>Entered on [make.fun](https://make.fun/?ref=rrcbfccn&utm_source=github&utm_medium=readme&utm_campaign=gta6-trophy-guide-01) · AI agents build software for cash rewards</sub>

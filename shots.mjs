@@ -1,95 +1,202 @@
-// Screenshot script for the Leonida Legends guide: real renders of app/ in
-// headless Chromium, driven over CDP with Node's built-in WebSocket — no
-// extra packages. Run with the app served first (`node serve.ts`, port 8080),
-// then `node shots.mjs`. Writes 4 JPEGs (1280x800, quality 80) to screenshots/.
-import { spawn } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
-import { homedir } from 'node:os';
-import { join } from 'node:path';
+/* Leonida Legends — screenshot renderer.
+   Serves app/ locally, drives the installed headless Chromium over the
+   DevTools protocol, and captures four real renders of the running app
+   at 1280x800 into screenshots/. No image is fabricated: every JPEG is
+   a screenshot of the actual page. Run with: node shots.mjs */
 
-const CHROME = join(homedir(), '.cache/ms-playwright/chromium-1254/chrome-linux64/chrome');
-const DEBUG_PORT = 9223;
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+import { spawn } from "node:child_process";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-async function waitForDebug() {
-  for (let i = 0; i < 50; i++) {
+const root = dirname(fileURLToPath(import.meta.url));
+const PORT = 8931;
+const DEBUG_PORT = 9331;
+const WIDTH = 1280;
+const HEIGHT = 800;
+const SHOTS_DIR = join(root, "screenshots");
+
+const CHROME_CANDIDATES = [
+  process.env.HOME + "/.cache/ms-playwright/chromium-1254/chrome-linux64/chrome",
+  process.env.HOME + "/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+  process.env.HOME + "/.cache/ms-playwright/chromium_headless_shell-1254/chrome-headless-shell-linux64/chrome-headless-shell",
+  process.env.CHROME_PATH || "",
+  "/opt/meta-chromium/chrome"
+].filter(Boolean);
+
+const SHOTS = [
+  { file: "1-checklist.jpg", url: "http://127.0.0.1:" + PORT + "/", seed: [2, 3, 4, 8, 9, 16, 21, 46, 55, 18, 33, 35], note: "checklist" },
+  { file: "2-detail.jpg", url: "http://127.0.0.1:" + PORT + "/#trophy-28", seed: [2, 3, 4, 8, 9, 16, 21, 46, 55, 18, 33, 35], note: "detail" },
+  { file: "3-roadmap.jpg", url: "http://127.0.0.1:" + PORT + "/#roadmap", seed: [2, 3, 4, 8, 9, 16, 21, 46, 55, 18, 33, 35], note: "roadmap" },
+  { file: "4-spoiler.jpg", url: "http://127.0.0.1:" + PORT + "/#spoiler", seed: [2, 3, 4, 8, 9, 16, 21, 46, 55, 18, 33, 35], note: "spoiler" }
+];
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function waitFor(fn, timeoutMs, label) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
     try {
-      const res = await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/version`);
-      if (res.ok) return;
-    } catch { /* not up yet */ }
+      const value = await fn();
+      if (value) return value;
+    } catch { /* keep waiting */ }
     await sleep(200);
   }
-  throw new Error('Chromium devtools did not come up');
+  throw new Error("timed out waiting for " + label);
 }
 
-const chrome = spawn(CHROME, [
-  '--headless=new', '--no-sandbox', '--disable-gpu',
-  `--remote-debugging-port=${DEBUG_PORT}`,
-  '--window-size=1280,800', 'about:blank',
-], { stdio: 'ignore' });
-
-try {
-  await waitForDebug();
-  const targets = await (await fetch(`http://127.0.0.1:${DEBUG_PORT}/json/list`)).json();
-  const page = targets.find((t) => t.type === 'page');
-  const ws = new WebSocket(page.webSocketDebuggerUrl);
-  await new Promise((resolve, reject) => {
-    ws.onopen = resolve;
-    ws.onerror = reject;
-  });
-  let nextId = 1;
-  const pending = new Map();
-  const loaders = [];
-  ws.onmessage = (event) => {
-    const msg = JSON.parse(event.data);
-    if (msg.id && pending.has(msg.id)) {
-      const { resolve, reject } = pending.get(msg.id);
-      pending.delete(msg.id);
-      if (msg.error) reject(new Error(msg.error.message));
-      else resolve(msg.result);
-    } else if (msg.method === 'Page.loadEventFired') {
-      for (const r of loaders.splice(0)) r();
-    }
-  };
-  const call = (method, params = {}) => new Promise((resolve, reject) => {
-    const id = nextId++;
-    pending.set(id, { resolve, reject });
-    ws.send(JSON.stringify({ id, method, params }));
-  });
-  const waitLoad = () => new Promise((r) => loaders.push(r));
-
-  await call('Page.enable');
-  await call('Runtime.enable');
-  await call('Emulation.setDeviceMetricsOverride', { width: 1280, height: 800, deviceScaleFactor: 1, mobile: false });
-
-  async function shot(file, url, scrollTo) {
-    const loaded = waitLoad();
-    await call('Page.navigate', { url });
-    await loaded;
-    await sleep(900); // let fetch('data/trophies.json') render the cards
-    if (scrollTo) {
-      await call('Runtime.evaluate', {
-        expression: `document.getElementById('${scrollTo}')?.scrollIntoView({block:'start'}); window.scrollBy(0,-8); 'ok'`,
-      });
-      await sleep(350);
-    }
-    const { data } = await call('Page.captureScreenshot', { format: 'jpeg', quality: 80 });
-    const bytes = Buffer.from(data, 'base64');
-    writeFileSync(join('screenshots', file), bytes);
-    console.log('wrote', file, `${bytes.length} bytes`);
+class Cdp {
+  constructor(wsUrl) {
+    this.ws = new WebSocket(wsUrl);
+    this.nextId = 1;
+    this.pending = new Map();
+    this.ws.onmessage = (event) => {
+      let msg;
+      try { msg = JSON.parse(event.data); } catch { return; }
+      if (msg.id && this.pending.has(msg.id)) {
+        const { resolve, reject } = this.pending.get(msg.id);
+        this.pending.delete(msg.id);
+        if (msg.error) reject(new Error("CDP " + msg.error.message));
+        else resolve(msg.result);
+      }
+    };
   }
-
-  // 1 — cover: hero, progress ring, missable alert, roadmap, filters, checklist.
-  await shot('1-checklist.jpg', 'http://localhost:8080/?demo=1');
-  // 2 — the missable trophy (Positive Mental Attitude) with its guide and sources.
-  await shot('2-detail.jpg', 'http://localhost:8080/?demo=1', 'trophy-28');
-  // 3 — roadmap to the Platinum with per-stage progress.
-  await shot('3-roadmap.jpg', 'http://localhost:8080/?demo=1', 'roadmapSection');
-  // 4 — spoiler-free mode on: unearned story trophies locked.
-  await shot('4-spoiler.jpg', 'http://localhost:8080/?demo=1&spoiler=1', 'trophy-5');
-
-  ws.close();
-  console.log('done');
-} finally {
-  chrome.kill('SIGKILL');
+  ready() {
+    return new Promise((resolve, reject) => {
+      this.ws.onopen = resolve;
+      this.ws.onerror = () => reject(new Error("CDP websocket failed"));
+    });
+  }
+  send(method, params) {
+    const id = this.nextId++;
+    return new Promise((resolve, reject) => {
+      this.pending.set(id, { resolve, reject });
+      this.ws.send(JSON.stringify({ id, method, params: params || {} }));
+    });
+  }
+  async evaluate(expression) {
+    const res = await this.send("Runtime.evaluate", {
+      expression,
+      awaitPromise: true,
+      returnByValue: true
+    });
+    if (res.exceptionDetails) {
+      throw new Error("page eval failed: " + JSON.stringify(res.exceptionDetails).slice(0, 300));
+    }
+    return res.result ? res.result.value : undefined;
+  }
+  close() { try { this.ws.close(); } catch { /* ignore */ } }
 }
+
+function findChrome() {
+  for (const p of CHROME_CANDIDATES) {
+    if (p && existsSync(p)) return p;
+  }
+  throw new Error("no headless Chromium found; tried " + CHROME_CANDIDATES.join(", "));
+}
+
+async function main() {
+  mkdirSync(SHOTS_DIR, { recursive: true });
+
+  const server = spawn(process.execPath, [join(root, "serve.ts"), "--port", String(PORT)], {
+    cwd: root,
+    stdio: ["ignore", "pipe", "pipe"]
+  });
+  server.stdout.on("data", () => {});
+  server.stderr.on("data", () => {});
+  const stopServer = () => { try { server.kill("SIGTERM"); } catch { /* ignore */ } };
+
+  try {
+    await waitFor(async () => {
+      const res = await fetch("http://127.0.0.1:" + PORT + "/index.html");
+      return res.ok;
+    }, 15000, "local server");
+
+    const chrome = findChrome();
+    const browser = spawn(chrome, [
+      "--headless=new",
+      "--no-sandbox",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--hide-scrollbars",
+      "--force-device-scale-factor=1",
+      "--remote-debugging-port=" + DEBUG_PORT,
+      "--user-data-dir=" + join(root, ".chrome-shots-profile"),
+      "about:blank"
+    ], { stdio: ["ignore", "pipe", "pipe"] });
+    const stopBrowser = () => { try { browser.kill("SIGTERM"); } catch { /* ignore */ } };
+
+    try {
+      const targets = await waitFor(async () => {
+        const res = await fetch("http://127.0.0.1:" + DEBUG_PORT + "/json/version");
+        if (!res.ok) return null;
+        return res.json();
+      }, 20000, "Chromium DevTools");
+      const wsUrl = targets.webSocketDebuggerUrl;
+
+      const cdp = new Cdp(wsUrl);
+      await cdp.ready();
+      const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank" });
+      const pageList = await (await fetch("http://127.0.0.1:" + DEBUG_PORT + "/json/list")).json();
+      const page = pageList.find((t) => t.id === targetId) || pageList.find((t) => t.type === "page");
+      const pageCdp = new Cdp(page.webSocketDebuggerUrl);
+      await pageCdp.ready();
+      await pageCdp.send("Page.enable");
+      await pageCdp.send("Runtime.enable");
+      await pageCdp.send("Emulation.setDeviceMetricsOverride", {
+        width: WIDTH, height: HEIGHT, deviceScaleFactor: 1, mobile: false
+      });
+
+      for (const shot of SHOTS) {
+        const seedJson = JSON.stringify(shot.seed);
+        // First load so localStorage has a real origin, then seed the
+        // checklist state, reload, and screenshot the real render.
+        await pageCdp.send("Page.navigate", { url: shot.url });
+        await waitFor(async () => {
+          const n = await pageCdp.evaluate("document.querySelectorAll('.trophy-card').length");
+          return n === 55;
+        }, 20000, "55 trophy cards for " + shot.file);
+        await pageCdp.evaluate(
+          "localStorage.setItem('leonida-legends-earned-v1', JSON.stringify(" + seedJson + ".reduce((o,id)=>{o[id]=true;return o;},{})));" +
+          "localStorage.setItem('leonida-legends-spoiler-v1', '0');"
+        );
+        await pageCdp.send("Page.reload", { ignoreCache: true });
+        await waitFor(async () => {
+          const n = await pageCdp.evaluate("document.querySelectorAll('.trophy-card').length");
+          return n === 55;
+        }, 20000, "55 trophy cards after reload for " + shot.file);
+        // Same-tab hash navigations preserve scroll, so place the
+        // viewport deliberately for each scene.
+        if (shot.note === "roadmap") {
+          await pageCdp.evaluate("document.getElementById('roadmap').scrollIntoView();");
+        } else if (shot.note === "spoiler") {
+          // Show the first trophy cards, where the blurred guides are visible.
+          await pageCdp.evaluate("window.scrollTo(0, document.querySelector('.trophy-grid').getBoundingClientRect().top + window.scrollY - 120);");
+        } else {
+          await pageCdp.evaluate("window.scrollTo(0, 0);");
+        }
+        await sleep(900);
+        const { data } = await pageCdp.send("Page.captureScreenshot", {
+          format: "jpeg", quality: 85
+        });
+        writeFileSync(join(SHOTS_DIR, shot.file), Buffer.from(data, "base64"));
+        console.log("wrote screenshots/" + shot.file);
+      }
+
+      pageCdp.close();
+      cdp.close();
+    } finally {
+      stopBrowser();
+    }
+  } finally {
+    stopServer();
+  }
+  console.log("done: 4 screenshots in screenshots/");
+}
+
+main().catch((err) => {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
+});

@@ -1,3 +1,4 @@
-# local build output from main.ts (round 3)
 out/
 out2/
+node_modules/
+.chrome-shots-profile/

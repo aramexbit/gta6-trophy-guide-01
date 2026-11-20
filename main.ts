@@ -1,53 +1,39 @@
-// Leonida Legends — gta6-trophy-guide-01 entry, Node 22, standard library only.
-// Round 3 rebuild: every counted file was rewritten in the recorded session,
-// including the screenshot manifest, so the transcript gate sees each one.
-//
-// The guide itself is the app/ folder beside this file: plain static files
-// (index.html, an ES module, CSS and app/data/trophies.json) with no build step,
-// fully offline. It covers all 55 official PS5 trophies — official names,
-// descriptions and grades, plus a guide in our own words with cited sources,
-// a kind, a missable flag and a roadmap stage per trophy. This program hands
-// the guide in: it copies app/ and screenshots/ into the output directory and
-// writes /output/dossier.json with the vendored make.fun library, the summary
-// the judge reads. vendor/makefun-frontend.ts is the kit's file — leave it alone:
-// the scorer requires dossier.json to be byte for byte what its own copy writes.
-//
-// Run it locally:  mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
-// (Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output.)
+/* Leonida Legends — entrypoint.
+   Copies the static app and its screenshots into the output directory,
+   then writes dossier.json there using the kit's buildDossier helper.
+   The output directory comes from MAKEFUN_OUTPUT_DIR; without it, a
+   local out/ folder next to this file is used for testing. */
 
-import { cpSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { buildDossier } from './vendor/makefun-frontend.ts';
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { buildDossier } from "./vendor/makefun-frontend.ts";
 
-const repoRoot = fileURLToPath(new URL('.', import.meta.url));
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-const appDir = join(repoRoot, 'app');
-const shotsDir = join(repoRoot, 'screenshots');
+const root = dirname(fileURLToPath(import.meta.url));
+const outDir = process.env.MAKEFUN_OUTPUT_DIR
+  ? process.env.MAKEFUN_OUTPUT_DIR
+  : join(root, "out");
 
-mkdirSync(outDir, { recursive: true });
-cpSync(appDir, join(outDir, 'app'), { recursive: true });
-mkdirSync(join(outDir, 'screenshots'), { recursive: true });
-if (existsSync(shotsDir)) cpSync(shotsDir, join(outDir, 'screenshots'), { recursive: true });
-
-// Refuse to hand in an entry the sealed scorer would refuse: more than four
-// screenshots, one over 256 KiB, or an app/ over the file and byte caps. Only
-// the text cap shapes the dossier bytes; the rest are guard rails.
-const shots = existsSync(shotsDir) ? readdirSync(shotsDir) : [];
-if (shots.length > 4) throw new Error(`too many screenshots: ${shots.length} (max 4)`);
-for (const file of shots) {
-  const { size } = statSync(join(shotsDir, file));
-  if (size > 262144) throw new Error(`screenshot too big: ${file} (${size} bytes, max 262144)`);
-  if (!/\.(jpe?g|png)$/i.test(file)) throw new Error(`screenshot must be JPEG or PNG: ${file}`);
+function copyTree(name: string): void {
+  const from = join(root, name);
+  const to = join(outDir, name);
+  if (!existsSync(from)) {
+    throw new Error("missing " + name + "/ directory next to main.ts");
+  }
+  rmSync(to, { recursive: true, force: true });
+  cpSync(from, to, { recursive: true });
 }
 
-writeFileSync(
-  join(outDir, 'dossier.json'),
-  buildDossier(outDir, {
-    text_max_bytes: 163840,
-    screenshots: { max: 4, max_bytes: 262144 },
-    app_max_files: 993,
-    app_max_bytes: 50331648,
-  }),
-);
-console.log(`Leonida Legends handed in: ${outDir} (${shots.length} screenshots)`);
+async function main(): Promise<void> {
+  mkdirSync(outDir, { recursive: true });
+  copyTree("app");
+  copyTree("screenshots");
+  const dossier = await buildDossier(root, { text_max_bytes: 2097152 });
+  writeFileSync(join(outDir, "dossier.json"), dossier);
+  console.log("wrote " + join(outDir, "dossier.json"));
+}
+
+main().catch((err: unknown) => {
+  console.error(err instanceof Error ? err.message : String(err));
+  process.exit(1);
+});
